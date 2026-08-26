@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clase 2 · De la pregunta al manuscrito</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1b1e24;
+    --paper:#efeee5;
+    --rail:#e5e3d7;
+    --line:#cecdbf;
+    --line-soft:#dcdacd;
+    --accent:#1c4e48;
+    --accent-ink:#123834;
+    --accent-soft:#d7e2dd;
+    --muted:#69685c;
+    --strike:#a9a798;
+    --serif:"Spectral", Georgia, "Times New Roman", serif;
+    --sans:"IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    --mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+    overflow:hidden;
+  }
+
+  /* subtle paper grain */
+  body::before{
+    content:"";
+    position:fixed;inset:0;
+    background-image:radial-gradient(rgba(27,30,36,.028) 1px, transparent 1px);
+    background-size:4px 4px;
+    pointer-events:none;
+    z-index:1;
+  }
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    position:fixed;top:0;left:0;right:0;height:52px;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 clamp(18px,4vw,54px);
+    border-bottom:1px solid var(--line);
+    background:var(--paper);
+    z-index:20;
+    font-family:var(--mono);
+    font-size:12px;letter-spacing:.06em;color:var(--muted);
+  }
+  .topbar__course{text-transform:uppercase;}
+  .topbar__course b{color:var(--accent);font-weight:500;}
+  .topbar__right{display:flex;align-items:center;gap:16px;}
+  .topbar__counter{color:var(--ink);font-variant-numeric:tabular-nums;}
+  .progress{width:120px;height:2px;background:var(--line);position:relative;}
+  .progress span{position:absolute;inset:0 auto 0 0;width:0;background:var(--accent);transition:width .45s cubic-bezier(.22,.61,.36,1);}
+  @media (max-width:640px){.progress{display:none;}}
+
+  /* ---------- deck ---------- */
+  .deck{position:fixed;top:52px;left:0;right:0;bottom:64px;z-index:5;}
+  .slide{
+    position:absolute;inset:0;
+    display:grid;
+    grid-template-columns:clamp(120px,15vw,210px) 1fr;
+    opacity:0;visibility:hidden;
+    transition:opacity .4s ease;
+    pointer-events:none;
+  }
+  .slide.is-active{opacity:1;visibility:visible;pointer-events:auto;}
+
+  /* ---------- gutter / margin ---------- */
+  .gutter{
+    position:relative;
+    border-right:1px solid var(--line);
+    background:var(--rail);
+    padding:clamp(20px,3vw,40px) clamp(14px,1.6vw,22px);
+    display:flex;flex-direction:column;
+    overflow:hidden;
+  }
+  .gutter__pilcrow{
+    font-family:var(--serif);
+    font-size:clamp(70px,9vw,120px);
+    line-height:.8;color:var(--accent);
+    opacity:.14;margin:-8px 0 0 -4px;
+    user-select:none;
+  }
+  .gutter__index{
+    font-family:var(--mono);font-size:12px;letter-spacing:.14em;
+    color:var(--accent);margin-top:6px;
+  }
+  .gutter__label{
+    font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+    text-transform:uppercase;color:var(--muted);margin-top:2px;
+  }
+  .gutter__note{
+    margin-top:auto;
+    font-family:var(--serif);font-style:italic;
+    font-size:clamp(13px,1.05vw,15px);line-height:1.4;color:var(--muted);
+    border-top:1px solid var(--line-soft);padding-top:12px;
+  }
+  .gutter__note::before{content:"※ ";font-style:normal;color:var(--accent);}
+
+  /* ---------- body ---------- */
+  .body{
+    padding:clamp(26px,5vh,64px) clamp(26px,6vw,96px);
+    overflow-y:auto;
+    display:flex;flex-direction:column;justify-content:center;
+    max-width:1100px;
+  }
+  .eyebrow{
+    font-family:var(--mono);font-size:12px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--accent);
+    margin:0 0 clamp(14px,2.2vh,22px);
+    display:flex;align-items:center;gap:12px;
+  }
+  .eyebrow::after{content:"";height:1px;flex:1;max-width:60px;background:var(--accent);opacity:.5;}
+  .title{
+    font-family:var(--serif);font-weight:600;
+    font-size:clamp(2rem,4.6vw,3.7rem);line-height:1.02;
+    letter-spacing:-.01em;margin:0 0 clamp(14px,2.4vh,26px);
+  }
+  .title em{font-style:italic;color:var(--accent);font-weight:500;}
+  .lead{
+    font-family:var(--serif);font-size:clamp(1.05rem,1.7vw,1.42rem);
+    line-height:1.5;color:var(--ink);max-width:46ch;margin:0 0 8px;
+  }
+  .note-inline{font-size:.95rem;color:var(--muted);max-width:52ch;line-height:1.55;}
+
+  /* animate children in */
+  .slide.is-active .body > *{
+    animation:rise .5s cubic-bezier(.22,.61,.36,1) both;
+  }
+  .slide.is-active .body > *:nth-child(1){animation-delay:.04s;}
+  .slide.is-active .body > *:nth-child(2){animation-delay:.10s;}
+  .slide.is-active .body > *:nth-child(3){animation-delay:.16s;}
+  .slide.is-active .body > *:nth-child(4){animation-delay:.22s;}
+  .slide.is-active .body > *:nth-child(5){animation-delay:.28s;}
+  .slide.is-active .body > *:nth-child(6){animation-delay:.34s;}
+  @keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+
+  /* ---------- reusable pieces ---------- */
+  .stack{display:flex;flex-direction:column;gap:clamp(10px,1.5vh,16px);margin-top:clamp(8px,2vh,20px);}
+
+  .step{
+    display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:baseline;
+    padding:14px 0;border-top:1px solid var(--line-soft);
+  }
+  .step:last-child{border-bottom:1px solid var(--line-soft);}
+  .step__mark{
+    font-family:var(--serif);font-size:1.35rem;color:var(--accent);
+    font-weight:600;min-width:2.2ch;
+  }
+  .step__mark span{font-family:var(--mono);font-size:.7rem;color:var(--muted);display:block;letter-spacing:.06em;margin-top:2px;}
+  .step__title{font-family:var(--sans);font-weight:600;font-size:1.06rem;}
+  .step__title small{display:block;font-weight:400;color:var(--muted);font-size:.92rem;margin-top:3px;line-height:1.45;}
+  .step__count{font-family:var(--mono);font-size:.72rem;color:var(--accent);border:1px solid var(--accent-soft);background:var(--accent-soft);padding:2px 7px;border-radius:2px;white-space:nowrap;margin-left:auto;}
+
+  .checks{list-style:none;padding:0;margin:clamp(8px,2vh,20px) 0 0;display:grid;gap:12px;}
+  .checks li{
+    display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:baseline;
+    font-size:1.02rem;line-height:1.45;
+  }
+  .checks li b{font-weight:600;}
+  .checks li span{color:var(--muted);}
+  .checks .box{
+    font-family:var(--mono);color:var(--accent);font-size:.95rem;
+    border:1.5px solid var(--accent);width:1.15em;height:1.15em;
+    display:inline-flex;align-items:center;justify-content:center;border-radius:2px;
+    transform:translateY(.12em);
+  }
+  .checks .box::before{content:"¶";font-size:.7em;line-height:1;}
+
+  .duo{display:grid;grid-template-columns:1fr 1fr;gap:clamp(14px,2.5vw,28px);margin-top:clamp(10px,2vh,22px);}
+  @media (max-width:720px){.duo{grid-template-columns:1fr;}}
+  .card{
+    border:1px solid var(--line);background:rgba(255,255,255,.35);
+    padding:clamp(16px,2vw,22px);border-radius:3px;
+  }
+  .card h3{margin:0 0 8px;font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:500;}
+  .card .ex{font-family:var(--serif);font-size:1.15rem;line-height:1.4;}
+  .card .ex b{color:var(--accent-ink);font-weight:600;}
+  .card p{margin:8px 0 0;font-size:.9rem;color:var(--muted);line-height:1.45;}
+
+  .rules{margin-top:clamp(12px,2vh,20px);display:grid;gap:10px;}
+  .rule{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:baseline;font-size:1rem;line-height:1.45;}
+  .rule .no{font-family:var(--mono);color:var(--accent);font-weight:500;font-size:.9rem;letter-spacing:.05em;}
+
+  /* manuscript-order strip (bridge slide) */
+  .flow{display:flex;align-items:center;gap:clamp(8px,1.4vw,16px);flex-wrap:wrap;margin-top:clamp(14px,3vh,28px);}
+  .flow .part{
+    font-family:var(--serif);font-size:clamp(1rem,1.5vw,1.3rem);
+    padding:12px 18px;border:1px solid var(--line);border-radius:3px;background:rgba(255,255,255,.4);
+  }
+  .flow .part.now{border-color:var(--accent);background:var(--accent);color:var(--paper);box-shadow:0 4px 18px rgba(28,78,72,.22);}
+  .flow .part.skip{color:var(--strike);border-style:dashed;}
+  .flow .part.skip s{text-decoration-color:var(--strike);}
+  .flow .arr{color:var(--muted);font-family:var(--mono);}
+
+  /* correspondence (entrega slide) */
+  .corr{margin-top:clamp(14px,2.5vh,24px);border:1px solid var(--line);border-radius:3px;overflow:hidden;background:rgba(255,255,255,.4);}
+  .corr__head{display:grid;grid-template-columns:1fr auto 1fr;background:var(--rail);border-bottom:1px solid var(--line);}
+  .corr__head span{padding:10px 16px;font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);}
+  .corr__head span:last-child{text-align:right;}
+  .corr__head .mid{text-align:center;color:var(--muted);}
+  .corr__body{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:clamp(14px,2vw,22px) 16px;gap:6px 0;font-family:var(--serif);}
+  .corr__body .l{font-size:1.02rem;}
+  .corr__body .r{font-size:1.02rem;text-align:right;color:var(--muted);}
+  .corr__body .link{color:var(--accent);font-family:var(--mono);font-size:1.1rem;padding:0 14px;}
+  .corr__foot{border-top:1px solid var(--line);padding:12px 16px;font-size:.92rem;color:var(--muted);background:var(--rail);}
+  .corr__foot b{color:var(--accent-ink);}
+
+  /* cover */
+  .cover .title{font-size:clamp(2.4rem,6.2vw,5rem);line-height:.98;}
+  .cover__meta{margin-top:clamp(18px,3vh,32px);font-family:var(--mono);font-size:.82rem;letter-spacing:.04em;color:var(--muted);line-height:1.9;}
+  .cover__meta b{color:var(--ink);font-weight:500;}
+  .cover__rule{width:64px;height:3px;background:var(--accent);margin:clamp(14px,2.5vh,24px) 0;}
+
+  /* agenda list */
+  .agenda{list-style:none;padding:0;margin:clamp(10px,2vh,20px) 0 0;counter-reset:ag;display:grid;gap:2px;}
+  .agenda li{
+    counter-increment:ag;display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:baseline;
+    padding:13px 4px;border-top:1px solid var(--line-soft);
+  }
+  .agenda li:last-child{border-bottom:1px solid var(--line-soft);}
+  .agenda li::before{content:"¶" counter(ag);font-family:var(--mono);font-size:.8rem;color:var(--accent);}
+  .agenda .t{font-family:var(--serif);font-size:1.15rem;}
+  .agenda .k{font-family:var(--mono);font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+
+  /* ---------- controls ---------- */
+  .controls{
+    position:fixed;bottom:0;left:0;right:0;height:64px;z-index:20;
+    display:flex;align-items:center;justify-content:center;gap:18px;
+    border-top:1px solid var(--line);background:var(--paper);
+    padding:0 clamp(18px,4vw,54px);
+  }
+  .nav-btn{
+    font-family:var(--mono);font-size:14px;color:var(--ink);
+    background:none;border:1px solid var(--line);border-radius:3px;
+    width:40px;height:34px;cursor:pointer;transition:.18s;
+    display:inline-flex;align-items:center;justify-content:center;
+  }
+  .nav-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .nav-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .dots{display:flex;gap:8px;}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--line);border:none;padding:0;cursor:pointer;transition:.2s;}
+  .dot:hover{background:var(--muted);}
+  .dot.is-active{background:var(--accent);transform:scale(1.35);}
+  .dot:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  /* ---------- mobile ---------- */
+  @media (max-width:640px){
+    .slide{grid-template-columns:1fr;grid-template-rows:auto 1fr;}
+    .gutter{
+      flex-direction:row;align-items:center;gap:12px;
+      border-right:none;border-bottom:1px solid var(--line);
+      padding:10px 18px;
+    }
+    .gutter__pilcrow{font-size:40px;margin:0;opacity:.2;}
+    .gutter__index{margin:0;}
+    .gutter__label{margin:0;}
+    .gutter__note{display:none;}
+    .body{padding:22px 22px 40px;justify-content:flex-start;}
+    .duo{grid-template-columns:1fr;}
+    .dots{display:none;}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none !important;transition:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <span class="topbar__course">Prácticas de Investigación · <b>UP</b></span>
+  <span class="topbar__right">
+    <span class="topbar__counter" id="counter">01 / 11</span>
+    <span class="progress"><span id="progressBar"></span></span>
+  </span>
+</header>
+
+<main class="deck" id="deck">
+
+  <!-- 0 · COVER -->
+  <section class="slide is-active" data-label="Portada">
+    <aside class="gutter">
+      <span class="gutter__pilcrow">¶</span>
+      <span class="gutter__index">CLASE 02</span>
+      <span class="gutter__label">Portada</span>
+      <p class="gutter__note">Segunda clase. Empezamos a escribir.</p>
+    </aside>
+    <div class="body cover">
+      <p class="eyebrow">Prácticas de Investigación · Clase 2</p>
+      <h1 class="title">De la pregunta<br>al <em>manuscrito</em>.</h1>
+      <div class="cover__rule"></div>
+      <p class="lead">Escribimos las primeras páginas del manuscrito. Página de título, marco teórico e hipótesis.</p>
+      <div class="cover__meta">
+        <b>Hoy construimos:</b> página de título · marco teórico · citas APA · hipótesis<br>
+        <b>Objetivo:</b> Entrega n 2<br>
+        Universidad de Palermo · Dr. Fernando Tonini
+      </div>
+    </div>
+  </section>
+
+  <!-- 1 · MAPA -->
+  <section class="slide" data-label="Mapa">
+    <aside class="gutter">
+      <span class="gutter__pilcrow">¶</span>
+      <span class="gutter__index">§0.1</span>
+      <span class="gutter__label">Mapa de la clase</span>
+      <p class="gutter__note">Todo lo de hoy termina en un Word.</p>
+    </aside>
+    <div class="body">
+      <p class="eyebrow">Lo que vamos a armar</p>
+      <h1 class="title">El recorrido de hoy</h1>
+      <ol class="agenda">
+        <li><span class="t">Normas APA </span><span class="k">formato</span></li>
+        <li><span class="t">El título y la página de título</span><span class="k">entrega</span></li>
+        <li><span class="t">Marco teórico en cuatro párrafos</span><span class="k">núcleo</span></li>
+        <li><span class="t">Citas - Tipos y usos</span><span class="k">APA</span></li>
+        <li><span class="t">Hipótesis para cada objetivo</span><span class="k">entrega</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 2 · APA -->
+  <section class="slide" data-label="Normas APA">
+    <aside class="gutter">
+      <span class="gutter__pilcrow">¶</span>
+      <span class="gutter__index">§1</span>
+      <span class="gutter__label">Formato</span>
+      <p class="gutter__note">APA es estructura antes que detalle.</p>
+    </aside>
+    <div class="body">
+      <p class="eyebrow">Normas APA</p>
+      <h1 class="title">APA! No vayas tan rápido</h1>
+      <p class="lead">Las veremos apartado por apartado.</p>
+      <div class="stack">
+        <ul class="checks">
+          <li><span class="box"></span><span><b>Estructura.</b> Qué apartados hay, cómo se llaman y qué niveles de encabezado usan.</span></li>
+          <li><span class="box"></span><span><b>Formato base.</b> Tipografía, interlineado doble, márgenes. Lo mínimo para que se vea prolijo.</span></li>
+        </ul>
+      </div> 
+    </div>
+  </section>
+
+  <!-- 3 · TÍTULO -->
+  <section class="slide" data-label="El título">
+    <aside class="gutter">
+      <span class="gutter__pilcrow">¶</span>
+      <span class="gutter__index">§2</span>
+      <span class="gutter__label">Primer desafío</span>
+      <p class="gutter__note">Corto, claro y que diga qué se estudia.</p>
+    </aside>
+    <div class="body">
+      <p class="eyebrow">Primer desafío</p>
+      <h1 class="title">Elegir un <em>título</em></h1>
+      <p class="lead">El primer entregable es redactar el título del trabajo. Suena simple; es de lo más difícil.</p>
+      <ul class="checks">
+        <li><span class="box"></span><span>Que nombre <b>qué se estudia</b> y <b>en quién</b>.</span></li>
+        <li><span class="box"></span><span>Específico, sin prometer más de lo que el estudio hace.</span></li>
+        <li><span class="box"></span><span>Se puede reescribir mil veces --> el título casi nunca sale a la primera.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 4 · PÁGINA DE TÍTULO -->
+  <section class="slide" data-label="Página de título">
+    <aside class="gutter">
+      <span class="gutter__pilcrow">¶</span>
+      <span class="gutter__index">§2.1</span>
+      <span class="gutter__label">Página de título</span>
+      <p class="gutter__note">Orden alfabético para evitar discusiones de autoría.</p>
+    </aside>
+    <div class="body">
+      <p class="eyebrow">Página de título · formato APA</p>
+      <h1 class="title">Qué lleva la portada</h1>
+      <ul class="checks">
+        <li><span class="box"></span><span><b>Título del manuscrito</b>.</span></li>
+        <li><span class="box"></span><span><b>Autores</b> — en orden alfabético.</span></li>
+        <li><span class="box"></span><span><b>Filiación</b> — Universidad de Palermo, para todos.</span></li>
+        <li><span class="box"></span><span><b>ORCID</b> — qué es y para qué sirve. No hace falta que se lo creen ahora.</span></li>
+        <li><span class="box"></span><span><b>Autor/a de correspondencia</b> — Lo simulamos y será el o la referente de cada grupo.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 5 · BRIDGE -->
+  <section class="slide" data-label="Del resumen al marco">
+    <aside class="gutter">
+      <span class="gutter__pilcrow">¶</span>
+      <span class="gutter__index">§3.0</span>
+      <span class="gutter__label">Orden del manuscrito</span>
+      <p class="gutter__note">El resumen existe, pero hoy no.</p>
+    </aside>
+    <div class="body">
+      <p class="eyebrow">Puente</p>
+      <h1 class="title">Después del título…</h1>
+      <p class="lead">El resumen va justo después de la portada. Existe, pero <em>hoy no lo escribimos</em>. Vamos directo al marco.</p>
+      <div class="flow">
+        <span class="part">Página de título</span>
+        <span class="arr">→</span>
+        <span class="part skip"><s>Resumen</s></span>
+        <span class="arr">→</span>
+        <span class="part now">Marco teórico</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 · MARCO TEÓRICO -->
+  <section class="slide" data-label="Marco teórico">
+    <aside class="gutter">
+      <span class="gutter__pilcrow">¶</span>
+      <span class="gutter__index">§3</span>
+      <span class="gutter__label">El núcleo de hoy</span>
+      <p class="gutter__note">Algunos párrafos. Ni un ensayo, ni una oración suelta.</p>
+    </aside>
+    <div class="body">
+      <p class="eyebrow">El núcleo de la clase</p>
+      <h1 class="title">Marco teórico<br>en <em>algunos párrafos</em></h1>
+      <div class="stack">
+        <div class="step">
+          <span class="step__mark">¶1</span>
+          <span class="step__title">Planteo del problema<small>Por qué el tema importa y qué falta saber.</small></span>
+          <span class="step__count">×1</span>
+        </div>
+        <div class="step">
+          <span class="step__mark">¶2</span>
+          <span class="step__title">La variable, en teoría<small>Qué es y cómo se define conceptualmente.</small></span>
+          <span class="step__count">×1–2</span>
+        </div>
+        <div class="step">
+          <span class="step__mark">¶3</span>
+          <span class="step__title">Antecedentes empíricos<small>Qué se sabe: qué encontraron otros estudios.</small></span>
+          <span class="step__count">×1–2</span>
+        </div>
+      </div>
+      <p class="note-inline">Se hace con los artículos en la mano. Tiene estructura de pirámide invertida. Ahora miramos cómo lo resuelven en investigaciones publicadas. No hay una extensión fija.</p>
+    </div>
+  </section>
+
+  <!-- 7 · CITAS -->
+  <section class="slide" data-label="Citas APA">
+    <aside class="gutter">
+      <span class="gutter__pilcrow">¶</span>
+      <span class="gutter__index">§3.1</span>
+      <span class="gutter__label">Citar</span>
+      <p class="gutter__note">La cita de la cita --> NO. Andá al original.</p>
+    </aside>
+    <div class="body">
+      <p class="eyebrow">Cómo se cita en el marco</p>
+      <h1 class="title">Dos formas de citar</h1>
+      <div class="duo">
+        <div class="card">
+          <h3>Parentética</h3>
+          <p class="ex">…mejora la evaluación de estímulos afectivos <b>(Autor/a, 2026)</b>.</p>
+          <p>El apoyo va entre paréntesis, al final de la idea.</p>
+        </div>
+        <div class="card">
+          <h3>Narrativa</h3>
+          <p class="ex"><b>Autor/a (2026)</b> sostiene que…</p>
+          <p>El autor entra en la oración; el año va al lado.</p>
+        </div>
+      </div>
+      <div class="rules">
+        <div class="rule"><span class="no">01</span><span>No se cambia el <b>orden de los autores</b>.</span></div>
+        <div class="rule"><span class="no">02</span><span><b>Nada de fuentes secundarias en cadena.</b> Si un paper cita a otro, buscás el original. </span></div>
+      </div>
+    </div>
+  </section>
+
+   
+  <!-- 7b · ET AL. -->
+  <section class="slide" data-label="et al.">
+    <aside class="gutter">
+      <span class="gutter__pilcrow">¶</span>
+      <span class="gutter__index">§3.2</span>
+      <span class="gutter__label">Citar · abreviar</span>
+      <p class="gutter__note">Tres o más: <i>et al.</i> desde la primera cita.</p>
+    </aside>
+    <div class="body">
+      <p class="eyebrow">Citar · cuando hay muchos autores</p>
+      <h1 class="title">Cuándo entra el <em>et al.</em></h1>
+      <p class="lead">Si una obra tiene muchos autores, no los escribís a todos. APA lo resuelve abreviando.</p>
+      <div class="stack">
+        <div class="step">
+          <span class="step__mark">1–2</span>
+          <span class="step__title">Uno o dos autores<small>Se nombran siempre, en todas las citas. Acá no hay et al.</small></span>
+          <span class="step__count">todos</span>
+        </div>
+        <div class="step">
+          <span class="step__mark">3+</span>
+          <span class="step__title">Tres o más autores<small>Primer autor + et al., ya desde la primera cita.</small></span>
+          <span class="step__count">et al.</span>
+        </div>
+      </div>
+      <div class="duo">
+        <div class="card">
+          <h3>Parentética</h3>
+          <p class="ex">…en adolescentes <b>(Autor/a et al., 2021)</b>.</p>
+        </div>
+        <div class="card">
+          <h3>Narrativa</h3>
+          <p class="ex"><b>Autor/a et al. (2021)</b> encontraron…</p>
+        </div>
+      </div>
+      <div class="rules">
+        <div class="rule"><span class="no">01</span><span>Significa <b>"y otros"</b>. Ojo con el punto: <b>et</b> sin punto, <b>al.</b> con punto. Nunca "et. al." ni "et al" pelado.</span></div>
+        <div class="rule"><span class="no">02</span><span>Si dos trabajos quedan idénticos al abreviar, sumás autores hasta que se distingan.</span></div>
+      </div>
+    </div>
+  </section>
+ 
+
+  <!-- 8 · HIPÓTESIS -->
+  <section class="slide" data-label="Hipótesis">
+    <aside class="gutter">
+      <span class="gutter__pilcrow">¶</span>
+      <span class="gutter__index">§4</span>
+      <span class="gutter__label">Segundo desafío</span>
+      <p class="gutter__note">Se fundamenta, no se intuye.</p>
+    </aside>
+    <div class="body">
+      <p class="eyebrow">Segundo desafío</p>
+      <h1 class="title">Las <em>hipótesis</em></h1>
+      <p class="lead">Ya tenés los objetivos. Ahora, una hipótesis <b>para cada objetivo específico</b>.</p>
+      <ul class="checks">
+        <li><span class="box"></span><span>Se apoyan en los <b>papers</b>, no en la corazonada.</span></li>
+        <li><span class="box"></span><span>Nada de "me parece que". Se <b>fundamenta</b> con lo que ya se sabe.</span></li>
+        <li><span class="box"></span><span>Las hipótesis se <b>derivan</b> del marco.</span></li>
+        <li><span class="box"></span><span>Una hipótesis ↔ un objetivo. Sin sobrantes ni faltantes.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 9 · ENTREGA -->
+  <section class="slide" data-label="La entrega">
+    <aside class="gutter">
+      <span class="gutter__pilcrow">¶</span>
+      <span class="gutter__index">§5</span>
+      <span class="gutter__label">Entrega · Word</span>
+      <p class="gutter__note">APA perfecto todavía no. Correspondencia sí.</p>
+    </aside>
+    <div class="body">
+      <p class="eyebrow">Después de la clase · archivo Word</p>
+      <h1 class="title">Lo que se entrega</h1>
+      <ul class="checks">
+        <li><span class="box"></span><span><b>Página de título</b></span></li>
+        <li><span class="box"></span><span><b>Marco teórico</b></span></li>
+        <li><span class="box"></span><span><b>Hipótesis</b> — una por objetivo específico</span></li>
+        <li><span class="box"></span><span><b>Listado de referencias</b> — un primer intento</span></li>
+      </ul>
+      <div class="corr">
+        <div class="corr__head"><span>En el marco teórico</span><span class="mid">↔</span><span>En las referencias</span></div>
+        <div class="corr__body">
+          <span class="l">(Autor/a, AÑO)</span><span class="link">⟷</span><span class="r">Apellido, Inicial. (2026)…</span>
+          <span class="l">(Autor/a &amp; Autor/a, AÑO)</span><span class="link">⟷</span><span class="r">Apellido, Inicial., &amp; Apellido, Inicial.</span>
+          <span class="l">(Messi &amp; Aymar, 2026)</span><span class="link">⟷</span><span class="r">Messi, L., &amp; Aymar, L. (2026)</span>
+        </div>
+        <div class="corr__foot">La <b>regla de oro:</b> todo lo citado está en las referencias, y todo lo referenciado fue citado. No pedimos APA perfecto — todavía. Sí, correspondencia exacta.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 · CIERRE -->
+  <section class="slide" data-label="Antes de entregar">
+    <aside class="gutter">
+      <span class="gutter__pilcrow">¶</span>
+      <span class="gutter__index">§5.1</span>
+      <span class="gutter__label">Checklist</span>
+      <p class="gutter__note">Revisá la correspondencia antes de mandar.</p>
+    </aside>
+    <div class="body">
+      <p class="eyebrow">Antes de entregar</p>
+      <h1 class="title">Repaso rápido</h1>
+      <ul class="checks">
+        <li><span class="box"></span><span>Título redactado y portada armada (autores, filiación, correspondencia).</span></li>
+        <li><span class="box"></span><span>Marco teórico: problema, variable y antecedentes.</span></li>
+        <li><span class="box"></span><span>Una hipótesis por objetivo, fundamentada en los papers.</span></li>
+        <li><span class="box"></span><span>Citas y referencias que <b>se corresponden</b>. Sin secundarias.</span></li>
+      </ul>
+      <p class="note-inline">Cualquier duda, la vemos en la tutoría. A escribir.</p>
+    </div>
+  </section>
+
+</main>
+
+<nav class="controls" aria-label="Navegación de diapositivas">
+  <button class="nav-btn" id="prev" aria-label="Anterior">←</button>
+  <div class="dots" id="dots"></div>
+  <button class="nav-btn" id="next" aria-label="Siguiente">→</button>
+</nav>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var total = slides.length;
+  var i = 0;
+  var counter = document.getElementById('counter');
+  var bar = document.getElementById('progressBar');
+  var dotsWrap = document.getElementById('dots');
+
+  // build dots
+  slides.forEach(function(s, n){
+    var d = document.createElement('button');
+    d.className = 'dot' + (n === 0 ? ' is-active' : '');
+    d.setAttribute('aria-label', 'Ir a la diapositiva ' + (n+1));
+    d.addEventListener('click', function(){ go(n); });
+    dotsWrap.appendChild(d);
+  });
+  var dots = Array.prototype.slice.call(dotsWrap.children);
+
+  function pad(n){ return (n < 10 ? '0' : '') + n; }
+
+  function go(n){
+    n = Math.max(0, Math.min(total - 1, n));
+    if(n === i) { return; }
+    slides[i].classList.remove('is-active');
+    dots[i].classList.remove('is-active');
+    i = n;
+    slides[i].classList.add('is-active');
+    dots[i].classList.add('is-active');
+    render();
+  }
+  function render(){
+    counter.textContent = pad(i + 1) + ' / ' + pad(total);
+    bar.style.width = ((i) / (total - 1) * 100) + '%';
+  }
+  function next(){ go(i + 1); }
+  function prev(){ go(i - 1); }
+
+  document.getElementById('next').addEventListener('click', next);
+  document.getElementById('prev').addEventListener('click', prev);
+
+  document.addEventListener('keydown', function(e){
+    if(['ArrowRight','ArrowDown','PageDown',' '].indexOf(e.key) > -1){ e.preventDefault(); next(); }
+    else if(['ArrowLeft','ArrowUp','PageUp'].indexOf(e.key) > -1){ e.preventDefault(); prev(); }
+    else if(e.key === 'Home'){ e.preventDefault(); go(0); }
+    else if(e.key === 'End'){ e.preventDefault(); go(total - 1); }
+  });
+
+  // touch swipe
+  var x0 = null;
+  document.addEventListener('touchstart', function(e){ x0 = e.touches[0].clientX; }, {passive:true});
+  document.addEventListener('touchend', function(e){
+    if(x0 === null){ return; }
+    var dx = e.changedTouches[0].clientX - x0;
+    if(Math.abs(dx) > 50){ dx < 0 ? next() : prev(); }
+    x0 = null;
+  }, {passive:true});
+
+  render();
+})();
+</script>
+</body>
+</html>
