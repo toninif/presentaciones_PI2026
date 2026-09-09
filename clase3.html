@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clase 3 · Método, APA y referencias</title>
+  <style>
+    :root { --ink:#17213a; --muted:#5b6680; --paper:#fffdf8; --navy:#162a4c; --blue:#2367d1; --aqua:#52d3c6; --yellow:#ffd76d; --coral:#ff7d6b; --line:#dce4ef; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; overflow:hidden; color:var(--ink); background:#e9eef5; font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .deck { position:relative; width:100vw; height:100vh; }
+    .slide { display:none; position:absolute; inset:0; padding:clamp(32px,6vw,88px) clamp(28px,8vw,130px); background:var(--paper); overflow:auto; }
+    .slide.active { display:flex; flex-direction:column; justify-content:center; animation:appear .32s ease both; }
+    @keyframes appear { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+    .slide::before { content:""; position:absolute; width:42vw; height:42vw; border-radius:50%; background:rgba(82,211,198,.18); right:-19vw; top:-23vw; pointer-events:none; }
+    .slide::after { content:""; position:absolute; width:24vw; height:24vw; border-radius:50%; background:rgba(255,215,109,.22); left:-13vw; bottom:-14vw; pointer-events:none; }
+    .content { position:relative; z-index:1; max-width:1160px; width:100%; margin:auto; }
+    .eyebrow { display:flex; align-items:center; gap:12px; margin:0 0 22px; color:var(--blue); font-size:13px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
+    .eyebrow::before { content:""; width:31px; height:3px; background:var(--coral); }
+    h1,h2,h3,p { margin-top:0; }
+    h1 { max-width:850px; margin-bottom:24px; font-size:clamp(43px,7vw,92px); line-height:.98; letter-spacing:-.065em; }
+    h2 { max-width:950px; margin-bottom:26px; font-size:clamp(32px,4.7vw,59px); line-height:1.02; letter-spacing:-.055em; }
+    h3 { font-size:19px; margin-bottom:10px; }
+    .lead { max-width:700px; color:var(--muted); font-size:clamp(19px,2.1vw,27px); line-height:1.42; }
+    .tag { display:inline-flex; align-items:center; width:max-content; padding:8px 13px; border:1px solid rgba(35,103,209,.25); border-radius:999px; background:#f4f8ff; color:var(--blue); font-size:14px; font-weight:750; }
+    .grid { display:grid; gap:18px; }
+    .cols-2 { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .cols-3 { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    .card { padding:23px; border:1px solid var(--line); border-radius:17px; background:rgba(255,255,255,.77); box-shadow:0 7px 22px rgba(24,43,75,.05); }
+    .card.accent { border-color:transparent; background:var(--navy); color:white; }
+    .card.accent p { color:#d8e2f4; }
+    .number { display:flex; align-items:center; justify-content:center; width:37px; height:37px; margin-bottom:16px; border-radius:50%; background:#e7f6f4; color:#167f79; font-weight:850; }
+    .accent .number { background:var(--aqua); color:var(--navy); }
+    .card p,.card li { color:var(--muted); font-size:16px; line-height:1.45; }
+    .accent li { color:#d8e2f4; }
+    ul { margin:8px 0 0; padding-left:21px; }
+    li+li { margin-top:8px; }
+    .flow { display:grid; grid-template-columns:1fr auto 1fr auto 1fr; align-items:center; gap:12px; }
+    .flow .step { min-height:132px; padding:21px; border-radius:16px; background:white; border:1px solid var(--line); }
+    .flow .arrow { color:var(--blue); font-size:34px; font-weight:300; }
+    .definition { padding:26px 28px; border-left:6px solid var(--coral); border-radius:0 15px 15px 0; background:#fff5ef; color:#3e3c45; font-size:clamp(20px,2.2vw,28px); line-height:1.4; }
+    .definition strong { color:var(--navy); }
+    .compare { display:grid; grid-template-columns:160px 1fr 1fr; overflow:hidden; border:1px solid var(--line); border-radius:16px; background:white; }
+    .compare > div { padding:14px 18px; border-right:1px solid var(--line); border-bottom:1px solid var(--line); font-size:15px; line-height:1.35; }
+    .compare > div:nth-child(3n) { border-right:0; }
+    .compare .head { background:var(--navy); color:white; font-weight:800; }
+    .compare .label { background:#f2f7ff; color:var(--blue); font-weight:750; }
+    .example { padding:23px 25px; border-radius:17px; background:#f1f7ff; border:1px solid #dceafa; }
+    .example .label { color:var(--blue); font-size:12px; font-weight:850; letter-spacing:.11em; text-transform:uppercase; }
+    .example p { margin:7px 0 0; font-size:17px; line-height:1.5; }
+    .template { margin-top:17px; padding:20px 24px; border-radius:14px; background:#1e2f4b; color:#f9fbff; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:clamp(15px,1.8vw,20px); line-height:1.65; white-space:pre-wrap; }
+    .callout { display:flex; align-items:flex-start; gap:15px; padding:17px 20px; border-radius:14px; background:#fff3cb; color:#55441f; font-size:17px; line-height:1.45; }
+    .callout b { font-size:22px; line-height:1; }
+    .checklist { display:grid; grid-template-columns:1fr 1fr; gap:10px 28px; margin-top:14px; }
+    .check { display:flex; gap:10px; align-items:flex-start; font-size:17px; line-height:1.35; }
+    .check::before { content:"✓"; flex:0 0 25px; height:25px; border-radius:50%; display:grid; place-items:center; background:#dbf5ec; color:#167b65; font-weight:900; }
+    .big-question { max-width:980px; font-size:clamp(29px,4.2vw,57px); line-height:1.09; letter-spacing:-.045em; }
+    .question-mark { position:absolute; right:10%; bottom:2%; z-index:0; color:#dbe7f8; font:800 clamp(180px,34vw,430px)/.7 Georgia,serif; }
+    .footer { position:fixed; z-index:4; right:24px; bottom:17px; display:flex; align-items:center; gap:14px; font-size:13px; color:var(--muted); }
+    .progress { width:130px; height:5px; overflow:hidden; border-radius:99px; background:#d9e1ec; }
+    .progress > span { display:block; height:100%; width:0; border-radius:inherit; background:var(--blue); transition:width .25s ease; }
+    .controls { position:fixed; z-index:5; left:24px; bottom:17px; display:flex; gap:8px; }
+    button { width:39px; height:35px; cursor:pointer; border:1px solid #d3dce9; border-radius:9px; background:white; color:var(--navy); font-size:19px; transition:.15s; }
+    button:hover { border-color:var(--blue); color:var(--blue); transform:translateY(-1px); }
+    .hint { position:fixed; z-index:4; left:24px; top:18px; color:#68738a; font-size:12px; }
+    .references { font-size:clamp(15px,1.7vw,19px); line-height:1.7; }
+    .references p { padding-left:28px; text-indent:-28px; margin:0 0 13px; }
+    @media (max-width:700px) { .slide { padding:55px 24px 72px; } .cols-2,.cols-3,.checklist { grid-template-columns:1fr; } .flow { grid-template-columns:1fr; } .flow .arrow { transform:rotate(90deg); text-align:center; height:28px; } .compare { grid-template-columns:90px 1fr 1fr; } .compare > div { padding:10px; font-size:12px; } .footer { right:15px; bottom:13px; } .controls { left:15px; bottom:13px; } .hint { display:none; } }
+    @media print { body { overflow:visible; background:white; } .deck { height:auto; } .slide { display:flex !important; position:relative; min-height:100vh; page-break-after:always; } .controls,.footer,.hint { display:none; } }
+  </style>
+</head>
+<body>
+  <main class="deck" aria-label="Presentación Clase 3">
+    <section class="slide active">
+      <div class="content">
+        <p class="eyebrow">Clase 3 · Proyecto de investigación</p>
+        <h1>Arrancamos con el método</h1>
+        <p class="lead">Hoy vamos a redactar tres secciones del trabajo: el <b>procedimiento</b>, las <b>medidas/instrumentos de medición</b> y las <b>referencias en normas APA</b>.</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="content">
+        <p class="eyebrow">Objetivo de la clase</p>
+        <h2>Que otra persona pueda entender (y eventualmente repetir) nuestro estudio.</h2>
+        <div class="grid cols-3">
+          <article class="card"><div class="number">1</div><h3>Ubicar el estudio</h3><p>Repasamos cómo se conectan el tipo de estudio y el diseño.</p></article>
+          <article class="card"><div class="number">2</div><h3>Escribir el método</h3><p>Transformamos decisiones metodológicas en los apartados de procedimiento y medidas.</p></article>
+          <article class="card accent"><div class="number">3</div><h3>Citar correctamente</h3><p>Armamos un listado de referencias ajustado a APA 7.ª edición.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="content">
+        <p class="eyebrow">Antes de escribir</p>
+        <h2>El método tiene una lógica.</h2>
+        <div class="flow">
+          <div class="step"><h3>Pregunta / objetivo</h3><p>¿Qué queremos conocer, comparar o explicar?</p></div><div class="arrow">→</div>
+          <div class="step"><h3>Tipo y diseño</h3><p>¿Qué enfoque permite responder esa pregunta?</p></div><div class="arrow">→</div>
+          <div class="step"><h3>Procedimiento y medidas</h3><p>¿Qué haremos y con qué instrumentos?</p></div>
+        </div>
+        <p class="definition" style="margin-top:30px"><strong>Guía:</strong> No deberíamos redactar apartados aislados. Al final del manuscrito cada decisión descripta en el método debe ser coherente con el objetivo de investigación.</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="content">
+        <p class="eyebrow">Repaso</p>
+        <h2>Tipo de estudio y diseño - Son parecidos, pero no iguales</h2>
+        <div class="compare">
+          <div class="head"></div><div class="head">Tipo de estudio</div><div class="head">Diseño</div>
+          <div class="label">Pregunta</div><div>¿Cuál es el alcance o propósito del estudio?</div><div>¿Cómo se organizará para responderla?</div>
+          <div class="label">Ejemplos</div><div>Exploratorio, descriptivo, correlacional, explicativo.</div><div>Experimental, cuasiexperimental, no experimental; transversal o longitudinal.</div>
+          <div class="label">Clave</div><div>Indica <b>qué buscamos conocer</b>.</div><div>Indica <b>cómo obtendremos la evidencia</b>.</div>
+        </div>
+        <div class="callout" style="margin-top:22px"><b>↳</b><span>Primero definimos el alcance; luego elegimos un diseño compatible. Por ejemplo: un estudio descriptivo puede usar un diseño no experimental y transversal.</span></div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="content">
+        <p class="eyebrow">Apartado metodológico</p>
+        <h2>¿Qué es el procedimiento?</h2>
+        <div class="grid cols-2">
+          <div>
+            <p class="definition"><strong>Es el relato ordenado de lo que ocurrió</strong> desde el contacto con participantes hasta el cierre o análisis de los datos.</p>
+            <p class="lead" style="font-size:20px;margin-top:23px">Debe permitir que alguien comprenda el recorrido real de la investigación.</p>
+          </div>
+          <article class="card accent">
+            <h3>Preguntas que debe responder</h3>
+            <ul>
+              <li>¿Cómo se convocó o accedió a la muestra?</li>
+              <li>¿Qué información se brindó y qué consentimientos se solicitaron?</li>
+              <li>¿En qué orden se aplicaron las técnicas?</li>
+              <li>¿Dónde, cuándo y cuánto duró?</li>
+              <li>¿Cómo se resguardaron confidencialidad y datos?</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="content">
+        <p class="eyebrow">Cómo redactarlo</p>
+        <h2>Un buen procedimiento se escribe como una secuencia.</h2>
+        <div class="grid cols-3">
+          <article class="card"><div class="number">01</div><h3>Contacto</h3><p>Acceso a la institución, convocatoria y criterios para participar.</p></article>
+          <article class="card"><div class="number">02</div><h3>Aplicación</h3><p>Consentimiento, instrucciones, orden de tareas o instrumentos, duración.</p></article>
+          <article class="card"><div class="number">03</div><h3>Cierre</h3><p>Codificación, almacenamiento de datos, agradecimiento y resguardo ético.</p></article>
+        </div>
+        <div class="example" style="margin-top:24px"><div class="label">Ejemplo de inicio</div><p>“Se contactó a las autoridades de … para solicitar autorización. Posteriormente, se invitó a participar a … quienes recibieron información sobre los objetivos del estudio y firmaron un consentimiento informado antes de completar los cuestionarios.”</p></div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="content">
+        <p class="eyebrow">Evitar errores frecuentes</p>
+        <h2>Procedimiento: de la nota informal al texto académico.</h2>
+        <div class="grid cols-2">
+          <article class="card"><h3 style="color:var(--coral)">✕ Demasiado vago</h3><p>“Se les pasó una encuesta a los alumnos y luego se analizaron las respuestas.”</p><p>Falta saber a quiénes, cómo, cuándo, con qué resguardo y qué encuesta.</p></article>
+          <article class="card"><h3 style="color:#178173">✓ Suficientemente preciso</h3><p>“Los cuestionarios se administraron de forma virtual a estudiantes mayores de 18 años. Antes de responder, se presentó el consentimiento informado. La participación fue anónima y tomó aproximadamente 10 minutos.”</p></article>
+        </div>
+        <div class="callout" style="margin-top:25px"><b>Tip</b><span>Usá pasado, seguí orden cronológico y datos concretos (En los planes esto se escribe en futuro. Recuerdenlo para sus planes de tesis). </span></div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="content">
+        <p class="eyebrow">Apartado metodológico</p>
+        <h2>¿Qué son las medidas/instrumentos de medición?</h2>
+        <div class="grid cols-2">
+          <div class="card accent"><h3>Las medidas explican cómo convertimos conceptos en datos.</h3><p>Presentan las variables, técnicas, instrumentos, escalas o registros con los que se recogerá la información.</p><p>Si estudiamos “estrés”, por ejemplo, hay que explicar <i>cómo</i> vamos a medir ese concepto.</p></div>
+          <div class="card"><h3>Para cada medida, indicar</h3><ul>
+            <li>Qué variable o dimensión evalúa.</li><li>Nombre del instrumento o técnica.</li><li>Autoría y año (con cita correspondiente).</li><li>Formato: cantidad de ítems, escala de respuesta, rangos.</li><li>Cómo se calcula o interpreta el puntaje, si aplica.</li><li>Propiedades relevantes: validez, confiabilidad o adaptación.</li>
+          </ul></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="content">
+        <p class="eyebrow">Cómo redactarlo</p>
+        <h2>Una medida debe ser identificable y comprensible.</h2>
+        <div class="template">Variable: [nombre de la variable]
+Instrumento: [nombre] ([Autor/a], [año])
+Descripción: [qué evalúa] mediante [número] ítems.
+Respuesta: escala de [rango] desde [anclaje] hasta [anclaje].
+Puntaje: [cómo se obtiene / qué representa].</div>
+        <div class="example" style="margin-top:19px"><div class="label">Ejemplo ficticio</div><p><b>Estrés percibido.</b> Se evaluará mediante la Escala de Estrés Percibido de 10 ítems (Autor/a, año). Las respuestas se registran en una escala de 0 (“nunca”) a 4 (“muy a menudo”). Puntajes mayores indican una mayor percepción de estrés.</p></div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="content">
+        <p class="eyebrow">Coherencia metodológica</p>
+        <h2>Chequeo rápido antes de avanzar.</h2>
+        <div class="checklist">
+          <div class="check">La variable medida responde a un objetivo o hipótesis.</div>
+          <div class="check">El instrumento realmente evalúa la variable planteada.</div>
+          <div class="check">La medida está citada en el texto y en las referencias.</div>
+          <div class="check">El procedimiento explica cuándo y cómo se aplicó esa medida.</div>
+          <div class="check">La escala y el sentido de los puntajes son claros.</div>
+          <div class="check">La redacción usa el mismo nombre para la variable en todo el trabajo.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="content">
+        <p class="eyebrow">Normas APA · 7.ª edición</p>
+        <h2>¿Para qué usamos referencias?</h2>
+        <div class="grid cols-3">
+          <article class="card"><div class="number">1</div><h3>Reconocer autorías</h3><p>Mostramos de dónde surgen las ideas, definiciones e instrumentos que usamos.</p></article>
+          <article class="card"><div class="number">2</div><h3>Respaldar decisiones</h3><p>Una medida o afirmación teórica gana fundamento al mostrar su fuente.</p></article>
+          <article class="card"><div class="number">3</div><h3>Permitir la consulta</h3><p>Quien lee puede localizar el trabajo original y revisar la información.</p></article>
+        </div>
+        <p class="definition" style="margin-top:25px">Regla: <strong> Toda fuente citada en el texto debe aparecer en las referencias y toda referencia corresponde a una cita en el texto.</strong></p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="content">
+        <p class="eyebrow">APA en el texto</p>
+        <h2>Dos formas simples de citar.</h2>
+        <div class="grid cols-2">
+          <article class="card"><h3>Cita parentética</h3><p>La autoría queda entre paréntesis.</p><div class="template">El estrés puede afectar el bienestar académico (Pérez &amp; Gómez, 2024).</div></article>
+          <article class="card"><h3>Cita narrativa</h3><p>La autoría forma parte de la oración.</p><div class="template">Pérez y Gómez (2024) señalan que el estrés puede afectar el bienestar académico.</div></article>
+        </div>
+        <div class="callout" style="margin-top:24px"><b>Ojo</b><span>Las citas de instrumentos, escalas y adaptaciones también deben aparecer. No alcanza con nombrar la escala.</span></div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="content">
+        <p class="eyebrow">Lista de referencias</p>
+        <h2>Formato básico de APA 7.</h2>
+        <div class="grid cols-2">
+          <article class="card"><h3>Artículo científico</h3><div class="template">Apellido, A. A., &amp; Apellido, B. B. (Año). Título del artículo. <i>Título de la Revista, volumen</i>(número), xx–xx. https://doi.org/xxxxx</div></article>
+          <article class="card"><h3>Libro</h3><div class="template">Apellido, A. A. (Año). <i>Título del libro</i>. Editorial.</div></article>
+        </div>
+        <div class="references card" style="margin-top:18px"><h3>Características de la lista</h3><p>• Título: <b>Referencias</b> · orden alfabético · sangría francesa · cursivas para títulos de obras y revistas · DOI o URL cuando corresponda.</p></div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <span class="question-mark">?</span>
+      <div class="content">
+        <p class="eyebrow">Pausa para pensar</p>
+        <p class="big-question">Si una persona leyera únicamente tu procedimiento y tus medidas... Podría imaginar con claridad cómo se realizó el estudio?</p>
+        <p class="lead" style="margin-top:27px">Usá esta pregunta como revisión final de cada apartado.</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="content">
+        <p class="eyebrow">Entrega · Clase 3</p>
+        <h2>Lo que tienen que presentar</h2>
+        <div class="grid cols-3">
+          <article class="card accent"><div class="number">A</div><h3>Procedimiento</h3><p>Redactado en secuencia, con los pasos necesarios para entender cómo se realizará el estudio.</p></article>
+          <article class="card"><div class="number">B</div><h3>Medidas</h3><p>Variables e instrumentos descritos y citados, con el nivel de detalle pertinente.</p></article>
+          <article class="card"><div class="number">C</div><h3>Referencias</h3><p>Listado de todas las fuentes utilizadas, ajustado a normas APA 7.ª edición.</p></article>
+        </div>
+        <div class="callout" style="margin-top:26px"><b>Antes de enviar</b><span>Revisen coherencia entre objetivo, diseño, procedimiento y medidas. También verifiquen que cada cita tenga su referencia completa.</span></div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="content">
+        <p class="eyebrow">Cierre</p>
+        <h1 style="font-size:clamp(43px,6.5vw,82px)">Manos a la obra!</h1>
+        <p class="lead">La metodología es la descripción transparente de cómo construimos evidencia para responder nuestra pregunta.</p>
+      </div>
+    </section>
+  </main>
+  <div class="hint">Usá ← → o la barra espaciadora para navegar</div>
+  <div class="controls"><button id="prev" aria-label="Diapositiva anterior">←</button><button id="next" aria-label="Diapositiva siguiente">→</button></div>
+  <div class="footer"><span id="counter">1 / 16</span><div class="progress" aria-hidden="true"><span></span></div></div>
+  <script>
+    const slides = [...document.querySelectorAll('.slide')];
+    const counter = document.getElementById('counter');
+    const progress = document.querySelector('.progress span');
+    let current = 0;
+    function show(index) {
+      current = (index + slides.length) % slides.length;
+      slides.forEach((slide, i) => slide.classList.toggle('active', i === current));
+      counter.textContent = `${current + 1} / ${slides.length}`;
+      progress.style.width = `${((current + 1) / slides.length) * 100}%`;
+      history.replaceState(null, '', `#${current + 1}`);
+    }
+    document.getElementById('prev').addEventListener('click', () => show(current - 1));
+    document.getElementById('next').addEventListener('click', () => show(current + 1));
+    document.addEventListener('keydown', event => {
+      if (['ArrowRight', ' ', 'PageDown'].includes(event.key)) { event.preventDefault(); show(current + 1); }
+      if (['ArrowLeft', 'PageUp'].includes(event.key)) { event.preventDefault(); show(current - 1); }
+      if (event.key === 'Home') show(0);
+      if (event.key === 'End') show(slides.length - 1);
+    });
+    const requested = Number(location.hash.slice(1));
+    show(Number.isInteger(requested) && requested > 0 && requested <= slides.length ? requested - 1 : 0);
+  </script>
+</body>
+</html>
